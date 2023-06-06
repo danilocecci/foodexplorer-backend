@@ -1,5 +1,6 @@
 const knex = require('../database/knex')
 const AppError = require('../utils/AppError')
+const DiskStorage = require('../providers/DiskStorage')
 
 class MealsController {
   async create(request, response) {
@@ -66,6 +67,8 @@ class MealsController {
     const { id } = request.params
     const { image, category, name, ingredients, description, price } =
       request.body
+    const imageFilename = request.file.filename
+    const diskStorage = new DiskStorage()
 
     const meal = await knex('meals').where({ id }).first()
 
@@ -73,13 +76,23 @@ class MealsController {
       throw new AppError('Este prato não existe!')
     }
 
-    meal.image = image ?? meal.image
+    if (meal.image) {
+      await diskStorage.deleteFile(meal.image)
+    }
+
+    const filename = await diskStorage.saveFile(imageFilename)
+
+    meal.image = image ?? filename
     meal.category = category ?? meal.category
     meal.name = name ?? meal.name
     meal.description = description ?? meal.description
     meal.price = price ?? meal.price
 
     const updatedMeal = await knex('meals').where({ id }).update(meal)
+
+    if (!ingredients) {
+      return response.json({ updatedMeal })
+    }
 
     const ingredientsToInsert = ingredients.map(ingredient => {
       return { meal_id: id, name: ingredient }
