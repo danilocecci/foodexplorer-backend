@@ -13,7 +13,7 @@ mealsRoutes.use(ensureAuthenticated)
 
 mealsRoutes.get('/', mealsController.index)
 mealsRoutes.get('/:id', mealsController.show)
-mealsRoutes.post('/', mealsController.create)
+mealsRoutes.post('/', upload.single('image'), mealsController.create)
 mealsRoutes.delete('/:id', mealsController.delete)
 mealsRoutes.patch('/:id', upload.single('image'), mealsController.update)
 

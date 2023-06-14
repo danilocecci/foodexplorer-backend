@@ -6,9 +6,15 @@ class MealsController {
   async create(request, response) {
     const { category, name, description, price, ingredients } = request.body
 
+    const imageFilename = request.file.filename
+    console.log(imageFilename)
+    const diskStorage = new DiskStorage()
+    const filename = await diskStorage.saveFile(imageFilename)
+
     const [meal_id] = await knex('meals').insert({
-      category,
+      image: filename,
       name,
+      category,
       description,
       price
     })
