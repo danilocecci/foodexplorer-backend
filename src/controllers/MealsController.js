@@ -7,7 +7,6 @@ class MealsController {
     const { category, name, description, price, ingredients } = request.body
 
     const imageFilename = request.file.filename
-    console.log(imageFilename)
     const diskStorage = new DiskStorage()
     const filename = await diskStorage.saveFile(imageFilename)
 
