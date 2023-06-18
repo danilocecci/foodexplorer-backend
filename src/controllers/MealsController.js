@@ -6,6 +6,12 @@ class MealsController {
   async create(request, response) {
     const { category, name, description, price, ingredients } = request.body
 
+    const mealExists = await knex('meals').where({ name }).first()
+
+    if (mealExists) {
+      throw new AppError('Este prato já está no cardápio!')
+    }
+
     const imageFilename = request.file.filename
     const diskStorage = new DiskStorage()
     const filename = await diskStorage.saveFile(imageFilename)
@@ -54,6 +60,8 @@ class MealsController {
 
     const meals = await knex('ingredients')
       .select([
+        'meals.id',
+        'meals.image',
         'meals.category',
         'meals.name',
         'meals.description',
