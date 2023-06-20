@@ -80,6 +80,7 @@ class MealsController {
     const { id } = request.params
     const { image, category, name, ingredients, description, price } =
       request.body
+
     const imageFilename = request.file.filename
     const diskStorage = new DiskStorage()
 
