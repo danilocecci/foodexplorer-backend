@@ -81,8 +81,9 @@ class MealsController {
     const { image, category, name, ingredients, description, price } =
       request.body
 
-    const imageFilename = request.file.filename
     const diskStorage = new DiskStorage()
+    let imageFilename
+    let filename
 
     const meal = await knex('meals').where({ id }).first()
 
@@ -90,11 +91,11 @@ class MealsController {
       throw new AppError('Este prato não existe!')
     }
 
-    if (meal.image) {
-      await diskStorage.deleteFile(meal.image)
+    if (meal.image !== image) {
+      await diskStorage.deleteFile(String(meal.image))
+      imageFilename = request.file.filename
+      filename = await diskStorage.saveFile(imageFilename)
     }
-
-    const filename = await diskStorage.saveFile(imageFilename)
 
     meal.image = image ?? filename
     meal.category = category ?? meal.category
